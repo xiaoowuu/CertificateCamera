@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -27,6 +28,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     private CameraPreview cameraPreview;
     private View cropView;
+    private ImageView flashImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +42,6 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_camera);
         cameraPreview = (CameraPreview) findViewById(R.id.camera_surface);
         float screenMinSize = Math.min(getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
-        float screenMaxSize = Math.max(getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
         float maxSize = screenMinSize / 9.0f * 16.0f;
         RelativeLayout.LayoutParams layoutParams;
         if (landscape) {
@@ -51,31 +52,38 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
         cameraPreview.setLayoutParams(layoutParams);
 
-        View contentView = findViewById(R.id.camera_content);
+        View contentView = findViewById(R.id.camera_crop_container);
         cropView = findViewById(R.id.camera_crop);
         if (landscape) {
-            float width = (int) (screenMaxSize - getResources().getDisplayMetrics().density * 160);
+            float height = (int) (screenMinSize * 0.752);
+            float width = (int) (height * 75.0f / 47.0f);
             LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams((int) width, ViewGroup.LayoutParams.MATCH_PARENT);
-            LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) (width * 9.0f / 16.0f));
+            LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
             contentView.setLayoutParams(contentParams);
             cropView.setLayoutParams(cropParams);
         } else {
-            float height = (int) (screenMaxSize - getResources().getDisplayMetrics().density * 160);
+            float width = (int) (screenMinSize * 0.752);
+            float height = (int) (width * 75.0f / 47.0f);
             LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) height);
-            LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) (height * 9.0f / 16.0f), (int) height);
+            LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
             contentView.setLayoutParams(contentParams);
             cropView.setLayoutParams(cropParams);
         }
 
-        findViewById(R.id.camera_take_photo).setOnClickListener(this);
-        findViewById(R.id.camera_flash_light).setOnClickListener(this);
+        flashImageView = (ImageView) findViewById(R.id.camera_flash);
+        findViewById(R.id.camera_close).setOnClickListener(this);
+        findViewById(R.id.camera_take).setOnClickListener(this);
+        flashImageView.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
-            case R.id.camera_take_photo:
+            case R.id.camera_close:
+                finish();
+                break;
+            case R.id.camera_take:
                 cameraPreview.takePhoto(new Camera.PictureCallback() {
                     @Override
                     public void onPictureTaken(byte[] data, Camera camera) {
@@ -109,8 +117,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 });
                 break;
-            case R.id.camera_flash_light:
-                cameraPreview.switchFlashLight();
+            case R.id.camera_flash:
+                boolean isFlashOn = cameraPreview.switchFlashLight();
+                flashImageView.setImageResource(isFlashOn ? R.mipmap.camera_flash_on : R.mipmap.camera_flash_off);
                 break;
         }
     }

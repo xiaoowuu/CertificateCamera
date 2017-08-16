@@ -12,17 +12,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <View
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="#5000" />
 
@@ -30,11 +30,11 @@
                 android:id="@+id/camera_crop_container"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <View
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
                     android:layout_weight="1"
                     android:background="#5000" />
 
@@ -46,8 +46,8 @@
                     android:src="@mipmap/camera_idcard_front" />
 
                 <View
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
                     android:layout_weight="1"
                     android:background="#5000" />
 
@@ -55,19 +55,18 @@
 
         </LinearLayout>
 
-
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:background="#5000"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/camera_close"
+                android:id="@+id/camera_flash"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@mipmap/camera_close" />
+                android:src="@mipmap/camera_flash_off" />
 
             <ImageView
                 android:id="@+id/camera_take"
@@ -77,10 +76,10 @@
                 android:src="@mipmap/camera_take" />
 
             <ImageView
-                android:id="@+id/camera_flash"
+                android:id="@+id/camera_close"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@mipmap/camera_flash_off" />
+                android:src="@mipmap/camera_close" />
 
         </LinearLayout>
 
