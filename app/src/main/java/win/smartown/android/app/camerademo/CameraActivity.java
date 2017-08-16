@@ -27,47 +27,55 @@ import win.smartown.library.camera.CameraPreview;
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
 
     private CameraPreview cameraPreview;
-    private View cropView;
+    private ImageView cropView;
     private ImageView flashImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        boolean landscape = getIntent().getBooleanExtra("landscape", true);
-        if (landscape) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else {
+        int type = getIntent().getIntExtra("type", 1);
+        if (type == 3) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
         setContentView(R.layout.activity_camera);
         cameraPreview = (CameraPreview) findViewById(R.id.camera_surface);
         float screenMinSize = Math.min(getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
         float maxSize = screenMinSize / 9.0f * 16.0f;
         RelativeLayout.LayoutParams layoutParams;
-        if (landscape) {
-            layoutParams = new RelativeLayout.LayoutParams((int) maxSize, (int) screenMinSize);
-        } else {
+        if (type == 3) {
             layoutParams = new RelativeLayout.LayoutParams((int) screenMinSize, (int) maxSize);
+        } else {
+            layoutParams = new RelativeLayout.LayoutParams((int) maxSize, (int) screenMinSize);
         }
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
         cameraPreview.setLayoutParams(layoutParams);
 
         View contentView = findViewById(R.id.camera_crop_container);
-        cropView = findViewById(R.id.camera_crop);
-        if (landscape) {
-            float height = (int) (screenMinSize * 0.752);
-            float width = (int) (height * 75.0f / 47.0f);
-            LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams((int) width, ViewGroup.LayoutParams.MATCH_PARENT);
-            LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
-            contentView.setLayoutParams(contentParams);
-            cropView.setLayoutParams(cropParams);
-        } else {
+        cropView = (ImageView) findViewById(R.id.camera_crop);
+        if (type == 3) {
             float width = (int) (screenMinSize * 0.752);
             float height = (int) (width * 75.0f / 47.0f);
             LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) height);
             LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
             contentView.setLayoutParams(contentParams);
             cropView.setLayoutParams(cropParams);
+        } else {
+            float height = (int) (screenMinSize * 0.752);
+            float width = (int) (height * 75.0f / 47.0f);
+            LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams((int) width, ViewGroup.LayoutParams.MATCH_PARENT);
+            LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
+            contentView.setLayoutParams(contentParams);
+            cropView.setLayoutParams(cropParams);
+        }
+        switch (type) {
+            case 2:
+                cropView.setImageResource(R.mipmap.camera_idcard_back);
+                break;
+            case 3:
+                cropView.setImageResource(R.mipmap.camera_company);
+                break;
         }
 
         flashImageView = (ImageView) findViewById(R.id.camera_flash);

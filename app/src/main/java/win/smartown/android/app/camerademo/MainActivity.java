@@ -29,21 +29,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void 横屏拍照(View view) {
-        takePhoto(true);
-    }
-
-    public void 竖屏拍照(View view) {
-        takePhoto(false);
-    }
-
-    private void takePhoto(boolean landscape) {
+    private void takePhoto(int type) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0x12);
             return;
         }
         Intent intent = new Intent(this, CameraActivity.class);
-        intent.putExtra("landscape", landscape);
+        intent.putExtra("type", type);
         startActivityForResult(intent, 0x13);
+    }
+
+    public void 身份证正面(View view) {
+        takePhoto(1);
+    }
+
+    public void 身份证反面(View view) {
+        takePhoto(2);
+    }
+
+    public void 营业执照(View view) {
+        takePhoto(3);
     }
 }
