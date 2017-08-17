@@ -2,7 +2,7 @@ package win.smartown.android.app.camerademo;
 
 import android.Manifest;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -23,9 +23,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 0x13 && resultCode == 0x14) {
-            Bitmap bitmap = data.getParcelableExtra("picture");
-            System.out.println(bitmap);
-            imageView.setImageBitmap(bitmap);
+            imageView.setImageBitmap(BitmapFactory.decodeFile(data.getStringExtra("result")));
         }
     }
 

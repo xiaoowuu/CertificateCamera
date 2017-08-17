@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -24,17 +22,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private SurfaceHolder surfaceHolder;
     private Camera camera;
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == 0x12) {
-                if (camera != null) {
-                    camera.autoFocus(null);
-                    handler.sendEmptyMessageDelayed(0x12, 3000);
-                }
-            }
-        }
-    };
 
     public CameraPreview(Context context) {
         super(context);
@@ -68,12 +55,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceCreated(SurfaceHolder holder) {
         try {
             camera = CameraUtils.openCamera();
+            Camera.Parameters parameters = camera.getParameters();
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 camera.setDisplayOrientation(90);
+                parameters.setRotation(90);
             } else {
                 camera.setDisplayOrientation(0);
+                parameters.setRotation(0);
             }
-            Camera.Parameters parameters = camera.getParameters();
             Camera.Size bestSize = getBestSize(parameters.getSupportedPreviewSizes());
             if (bestSize != null) {
                 parameters.setPreviewSize(bestSize.width, bestSize.height);
@@ -85,7 +74,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             camera.setParameters(parameters);
             camera.setPreviewDisplay(surfaceHolder);
             camera.startPreview();
-            handler.sendEmptyMessage(0x12);
+            camera.autoFocus(null);
         } catch (Exception e) {
             Log.d(TAG, "Error setting camera preview: " + e.getMessage());
         }
@@ -109,13 +98,16 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return null;
     }
 
-    public void release() {
-        handler.removeCallbacksAndMessages(null);
+    private void release() {
         if (camera != null) {
             camera.stopPreview();
             camera.release();
             camera = null;
         }
+    }
+
+    public void focus() {
+        camera.autoFocus(null);
     }
 
     public boolean switchFlashLight() {
@@ -135,7 +127,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void takePhoto(Camera.PictureCallback pictureCallback) {
-        handler.removeCallbacksAndMessages(null);
         camera.takePicture(null, null, pictureCallback);
     }
 

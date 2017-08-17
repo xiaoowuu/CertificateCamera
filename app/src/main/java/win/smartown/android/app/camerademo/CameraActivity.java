@@ -31,12 +31,15 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView cropView;
     private ImageView flashImageView;
 
+    /**
+     * 1.身份证正面；2.身份证反面；3.营业执照
+     */
     private int type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        type = getIntent().getIntExtra("type", 1);
+        type = getIntent().getIntExtra("type", 0);
         if (type == 3) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
@@ -44,7 +47,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         }
         setContentView(R.layout.activity_camera);
         cameraPreview = (CameraPreview) findViewById(R.id.camera_surface);
+//        //获取屏幕最小边，设置为cameraPreview的宽
         float screenMinSize = Math.min(getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
+//        //根据cameraPreview的宽，计算出cameraPreview的长，长宽比为标准的16:9
         float maxSize = screenMinSize / 9.0f * 16.0f;
         RelativeLayout.LayoutParams layoutParams;
         if (type == 3) {
@@ -58,14 +63,14 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         containerView = findViewById(R.id.camera_crop_container);
         cropView = (ImageView) findViewById(R.id.camera_crop);
         if (type == 3) {
-            float width = (int) (screenMinSize * 0.752);
-            float height = (int) (width * 75.0f / 47.0f);
+            float width = (int) (screenMinSize * 0.75);
+            float height = (int) (width * 43.0f / 30.0f);
             LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) height);
             LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
             containerView.setLayoutParams(containerParams);
             cropView.setLayoutParams(cropParams);
         } else {
-            float height = (int) (screenMinSize * 0.752);
+            float height = (int) (screenMinSize * 0.75);
             float width = (int) (height * 75.0f / 47.0f);
             LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams((int) width, ViewGroup.LayoutParams.MATCH_PARENT);
             LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
@@ -73,6 +78,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             cropView.setLayoutParams(cropParams);
         }
         switch (type) {
+            case 1:
+                cropView.setImageResource(R.mipmap.camera_idcard_front);
+                break;
             case 2:
                 cropView.setImageResource(R.mipmap.camera_idcard_back);
                 break;
@@ -82,6 +90,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         flashImageView = (ImageView) findViewById(R.id.camera_flash);
+        cameraPreview.setOnClickListener(this);
         findViewById(R.id.camera_close).setOnClickListener(this);
         findViewById(R.id.camera_take).setOnClickListener(this);
         flashImageView.setOnClickListener(this);
@@ -91,6 +100,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
+            case R.id.camera_surface:
+                cameraPreview.focus();
+                break;
             case R.id.camera_close:
                 finish();
                 break;
@@ -108,10 +120,19 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                                     originalFileOutputStream.close();
 
                                     Bitmap bitmap = BitmapFactory.decodeFile(originalFile.getPath());
-                                    float left = (float) containerView.getLeft() / (float) cameraPreview.getWidth();
-                                    float top = (float) cropView.getTop() / (float) cameraPreview.getHeight();
-                                    float right = (float) containerView.getRight() / (float) cameraPreview.getWidth();
-                                    float bottom = (float) cropView.getBottom() / (float) cameraPreview.getHeight();
+
+                                    float left, top, right, bottom;
+                                    if (type == 3) {
+                                        left = (float) cropView.getLeft() / (float) cameraPreview.getWidth();
+                                        top = (float) containerView.getTop() / (float) cameraPreview.getHeight();
+                                        right = (float) cropView.getRight() / (float) cameraPreview.getWidth();
+                                        bottom = (float) containerView.getBottom() / (float) cameraPreview.getHeight();
+                                    } else {
+                                        left = (float) containerView.getLeft() / (float) cameraPreview.getWidth();
+                                        top = (float) cropView.getTop() / (float) cameraPreview.getHeight();
+                                        right = (float) containerView.getRight() / (float) cameraPreview.getWidth();
+                                        bottom = (float) cropView.getBottom() / (float) cameraPreview.getHeight();
+                                    }
                                     Bitmap cropBitmap = Bitmap.createBitmap(bitmap,
                                             (int) (left * (float) bitmap.getWidth()),
                                             (int) (top * (float) bitmap.getHeight()),
@@ -127,7 +148,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                                         @Override
                                         public void run() {
                                             Intent intent = new Intent();
-                                            intent.putExtra("picture", cropFile.getPath());
+                                            intent.putExtra("result", cropFile.getPath());
                                             setResult(0x14, intent);
                                             finish();
                                         }
