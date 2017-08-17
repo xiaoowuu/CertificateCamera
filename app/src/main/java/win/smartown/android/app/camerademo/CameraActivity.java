@@ -27,13 +27,16 @@ import win.smartown.library.camera.CameraPreview;
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
 
     private CameraPreview cameraPreview;
+    private View containerView;
     private ImageView cropView;
     private ImageView flashImageView;
+
+    private int type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int type = getIntent().getIntExtra("type", 1);
+        type = getIntent().getIntExtra("type", 1);
         if (type == 3) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
@@ -52,21 +55,21 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
         cameraPreview.setLayoutParams(layoutParams);
 
-        View contentView = findViewById(R.id.camera_crop_container);
+        containerView = findViewById(R.id.camera_crop_container);
         cropView = (ImageView) findViewById(R.id.camera_crop);
         if (type == 3) {
             float width = (int) (screenMinSize * 0.752);
             float height = (int) (width * 75.0f / 47.0f);
-            LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) height);
+            LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) height);
             LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
-            contentView.setLayoutParams(contentParams);
+            containerView.setLayoutParams(containerParams);
             cropView.setLayoutParams(cropParams);
         } else {
             float height = (int) (screenMinSize * 0.752);
             float width = (int) (height * 75.0f / 47.0f);
-            LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams((int) width, ViewGroup.LayoutParams.MATCH_PARENT);
+            LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams((int) width, ViewGroup.LayoutParams.MATCH_PARENT);
             LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
-            contentView.setLayoutParams(contentParams);
+            containerView.setLayoutParams(containerParams);
             cropView.setLayoutParams(cropParams);
         }
         switch (type) {
@@ -94,34 +97,56 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.camera_take:
                 cameraPreview.takePhoto(new Camera.PictureCallback() {
                     @Override
-                    public void onPictureTaken(byte[] data, Camera camera) {
-                        File pictureFile = new File(getExternalCacheDir(), "picture.jpg");
-                        try {
-                            FileOutputStream fos = new FileOutputStream(pictureFile);
-                            fos.write(data);
-                            fos.close();
+                    public void onPictureTaken(final byte[] data, Camera camera) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    File originalFile = getOriginalFile();
+                                    FileOutputStream originalFileOutputStream = new FileOutputStream(originalFile);
+                                    originalFileOutputStream.write(data);
+                                    originalFileOutputStream.close();
 
-                            Bitmap bitmap = BitmapFactory.decodeFile(pictureFile.getPath());
-                            float x = (float) cropView.getLeft() / (float) cropView.getWidth() * bitmap.getWidth();
-                            float y = (float) cropView.getTop() / (float) cropView.getHeight() * bitmap.getHeight();
-                            float width = (float) cropView.getWidth() / (float) cameraPreview.getWidth() * bitmap.getWidth();
-                            float height = (float) cropView.getWidth() / (float) cameraPreview.getWidth() * bitmap.getHeight();
+                                    Bitmap bitmap = BitmapFactory.decodeFile(originalFile.getPath());
+                                    float left = (float) containerView.getLeft() / (float) cameraPreview.getWidth();
+                                    float top = (float) cropView.getTop() / (float) cameraPreview.getHeight();
+                                    float right = (float) containerView.getRight() / (float) cameraPreview.getWidth();
+                                    float bottom = (float) cropView.getBottom() / (float) cameraPreview.getHeight();
+                                    Bitmap cropBitmap = Bitmap.createBitmap(bitmap,
+                                            (int) (left * (float) bitmap.getWidth()),
+                                            (int) (top * (float) bitmap.getHeight()),
+                                            (int) ((right - left) * (float) bitmap.getWidth()),
+                                            (int) ((bottom - top) * (float) bitmap.getHeight()));
 
-                            Bitmap cropBitmap = Bitmap.createBitmap(bitmap, (int) x, (int) y, (int) width, (int) height);
+                                    final File cropFile = getCropFile();
+                                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(cropFile));
+                                    cropBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                                    bos.flush();
+                                    bos.close();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Intent intent = new Intent();
+                                            intent.putExtra("picture", cropFile.getPath());
+                                            setResult(0x14, intent);
+                                            finish();
+                                        }
+                                    });
+                                    return;
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // TODO: 2017/8/17 failed
+                                    }
+                                });
+                            }
+                        }).start();
 
-                            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(pictureFile));
-                            cropBitmap.compress(Bitmap.CompressFormat.JPEG, 80, bos);
-                            bos.flush();
-                            bos.close();
-                            Intent intent = new Intent();
-                            intent.putExtra("picture", pictureFile.getPath());
-                            setResult(0x14, intent);
-                            finish();
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
                     }
                 });
                 break;
@@ -130,6 +155,30 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 flashImageView.setImageResource(isFlashOn ? R.mipmap.camera_flash_on : R.mipmap.camera_flash_off);
                 break;
         }
+    }
+
+    private File getOriginalFile() {
+        switch (type) {
+            case 1:
+                return new File(getExternalCacheDir(), "idCardFront.jpg");
+            case 2:
+                return new File(getExternalCacheDir(), "idCardBack.jpg");
+            case 3:
+                return new File(getExternalCacheDir(), "companyInfo.jpg");
+        }
+        return new File(getExternalCacheDir(), "picture.jpg");
+    }
+
+    private File getCropFile() {
+        switch (type) {
+            case 1:
+                return new File(getExternalCacheDir(), "idCardFrontCrop.jpg");
+            case 2:
+                return new File(getExternalCacheDir(), "idCardBackCrop.jpg");
+            case 3:
+                return new File(getExternalCacheDir(), "companyInfoCrop.jpg");
+        }
+        return new File(getExternalCacheDir(), "pictureCrop.jpg");
     }
 
 }
