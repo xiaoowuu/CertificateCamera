@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -24,8 +25,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 0x13 && resultCode == 0x14) {
-            imageView.setImageBitmap(BitmapFactory.decodeFile(data.getStringExtra("result")));
+        final String path = CameraActivity.getResult(requestCode, resultCode, data);
+        if (!TextUtils.isEmpty(path)) {
+            imageView.setImageBitmap(BitmapFactory.decodeFile(path));
         }
     }
 
@@ -34,25 +36,23 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0x12);
             return;
         }
-        Intent intent = new Intent(this, CameraActivity.class);
-        intent.putExtra("type", type);
-        startActivityForResult(intent, 0x13);
+        CameraActivity.openCertificateCamera(this, type);
     }
 
     public void 身份证正面(View view) {
-        takePhoto(1);
+        takePhoto(CameraActivity.TYPE_IDCARD_FRONT);
     }
 
     public void 身份证反面(View view) {
-        takePhoto(2);
+        takePhoto(CameraActivity.TYPE_IDCARD_BACK);
     }
 
     public void 营业执照竖版(View view) {
-        takePhoto(3);
+        takePhoto(CameraActivity.TYPE_COMPANY_PORTRAIT);
     }
 
     public void 营业执照横版(View view) {
-        takePhoto(4);
+        takePhoto(CameraActivity.TYPE_COMPANY_LANDSCAPE);
     }
 
 }

@@ -58,34 +58,63 @@
 
         </LinearLayout>
 
-
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/preview_mock"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="136dp"
+            android:background="@color/preview_mock">
 
-            <ImageView
-                android:id="@+id/camera_close"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@mipmap/camera_close" />
+            <LinearLayout
+                android:id="@+id/camera_option"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/camera_take"
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                android:layout_margin="32dp"
-                android:src="@mipmap/camera_take" />
+                <ImageView
+                    android:id="@+id/camera_close"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/camera_close" />
 
-            <ImageView
-                android:id="@+id/camera_flash"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@mipmap/camera_flash_off" />
+                <ImageView
+                    android:id="@+id/camera_take"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_margin="32dp"
+                    android:src="@mipmap/camera_take" />
 
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/camera_flash"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/camera_flash_off" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/camera_result"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/camera_result_cancel"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@mipmap/camera_result_cancel" />
+
+                <ImageView
+                    android:id="@+id/camera_result_ok"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="80dp"
+                    android:src="@mipmap/camera_result_ok" />
+
+            </LinearLayout>
+
+        </FrameLayout>
 
     </LinearLayout>
 </RelativeLayout>
