@@ -147,6 +147,7 @@ public class CameraActivity extends Activity implements View.OnClickListener {
             goBack();
         } else if (id == R.id.camera_result_cancel) {
             optionView.setVisibility(View.VISIBLE);
+            cameraPreview.setEnabled(true);
             resultView.setVisibility(View.GONE);
             cameraPreview.startPreview();
         }
@@ -154,6 +155,7 @@ public class CameraActivity extends Activity implements View.OnClickListener {
 
     private void takePhoto() {
         optionView.setVisibility(View.GONE);
+        cameraPreview.setEnabled(false);
         cameraPreview.takePhoto(new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data, Camera camera) {
@@ -207,6 +209,7 @@ public class CameraActivity extends Activity implements View.OnClickListener {
                             @Override
                             public void run() {
                                 optionView.setVisibility(View.VISIBLE);
+                                cameraPreview.setEnabled(true);
                             }
                         });
                     }
