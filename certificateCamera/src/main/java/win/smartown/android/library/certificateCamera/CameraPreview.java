@@ -87,13 +87,19 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private Camera.Size getBestSize(List<Camera.Size> sizes) {
-        for (int i = sizes.size() - 1; i >= 0; i--) {
-            Camera.Size size = sizes.get(i);
+        Camera.Size bestSize = null;
+        for (Camera.Size size : sizes) {
             if ((float) size.width / (float) size.height == 16.0f / 9.0f) {
-                return size;
+                if (bestSize == null) {
+                    bestSize = size;
+                } else {
+                    if (size.width > bestSize.width) {
+                        bestSize = size;
+                    }
+                }
             }
         }
-        return null;
+        return bestSize;
     }
 
     private void release() {
@@ -128,7 +134,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         camera.takePicture(null, null, pictureCallback);
     }
 
-    public void startPreview(){
+    public void startPreview() {
         camera.startPreview();
     }
 
