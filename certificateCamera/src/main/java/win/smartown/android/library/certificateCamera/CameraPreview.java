@@ -1,11 +1,10 @@
-package win.smartown.library.camera;
+package win.smartown.android.library.certificateCamera;
 
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.os.Build;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -87,7 +86,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         release();
     }
 
-    @Nullable
     private Camera.Size getBestSize(List<Camera.Size> sizes) {
         for (int i = sizes.size() - 1; i >= 0; i--) {
             Camera.Size size = sizes.get(i);

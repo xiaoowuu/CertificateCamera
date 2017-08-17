@@ -1,12 +1,12 @@
-package win.smartown.android.app.camerademo;
+package win.smartown.android.library.certificateCamera;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -19,12 +19,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import win.smartown.library.camera.CameraPreview;
-
 /**
  * Created by Smartown on 2017/8/16.
  */
-public class CameraActivity extends AppCompatActivity implements View.OnClickListener {
+public class CameraActivity extends Activity implements View.OnClickListener {
 
     private CameraPreview cameraPreview;
     private View containerView;
@@ -109,83 +107,82 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        switch (id) {
-            case R.id.camera_surface:
-                cameraPreview.focus();
-                break;
-            case R.id.camera_close:
-                finish();
-                break;
-            case R.id.camera_take:
-                cameraPreview.takePhoto(new Camera.PictureCallback() {
+        if (id == R.id.camera_surface) {
+            cameraPreview.focus();
+        } else if (id == R.id.camera_close) {
+            finish();
+        } else if (id == R.id.camera_take) {
+            takePhoto();
+        } else if (id == R.id.camera_flash) {
+            boolean isFlashOn = cameraPreview.switchFlashLight();
+            flashImageView.setImageResource(isFlashOn ? R.mipmap.camera_flash_on : R.mipmap.camera_flash_off);
+        }
+    }
+
+    private void takePhoto() {
+        cameraPreview.takePhoto(new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(final byte[] data, Camera camera) {
+                new Thread(new Runnable() {
                     @Override
-                    public void onPictureTaken(final byte[] data, Camera camera) {
-                        new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            File originalFile = getOriginalFile();
+                            FileOutputStream originalFileOutputStream = new FileOutputStream(originalFile);
+                            originalFileOutputStream.write(data);
+                            originalFileOutputStream.close();
+
+                            Bitmap bitmap = BitmapFactory.decodeFile(originalFile.getPath());
+
+                            float left, top, right, bottom;
+                            if (type == 3) {
+                                left = (float) cropView.getLeft() / (float) cameraPreview.getWidth();
+                                top = ((float) containerView.getTop() - (float) cameraPreview.getTop()) / (float) cameraPreview.getHeight();
+                                right = (float) cropView.getRight() / (float) cameraPreview.getWidth();
+                                bottom = (float) containerView.getBottom() / (float) cameraPreview.getHeight();
+                            } else {
+                                left = ((float) containerView.getLeft() - (float) cameraPreview.getLeft()) / (float) cameraPreview.getWidth();
+                                top = (float) cropView.getTop() / (float) cameraPreview.getHeight();
+                                right = (float) containerView.getRight() / (float) cameraPreview.getWidth();
+                                bottom = (float) cropView.getBottom() / (float) cameraPreview.getHeight();
+                            }
+                            Bitmap cropBitmap = Bitmap.createBitmap(bitmap,
+                                    (int) (left * (float) bitmap.getWidth()),
+                                    (int) (top * (float) bitmap.getHeight()),
+                                    (int) ((right - left) * (float) bitmap.getWidth()),
+                                    (int) ((bottom - top) * (float) bitmap.getHeight()));
+
+                            final File cropFile = getCropFile();
+                            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(cropFile));
+                            cropBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                            bos.flush();
+                            bos.close();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Intent intent = new Intent();
+                                    intent.putExtra("result", cropFile.getPath());
+                                    setResult(0x14, intent);
+                                    finish();
+                                }
+                            });
+                            return;
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                try {
-                                    File originalFile = getOriginalFile();
-                                    FileOutputStream originalFileOutputStream = new FileOutputStream(originalFile);
-                                    originalFileOutputStream.write(data);
-                                    originalFileOutputStream.close();
-
-                                    Bitmap bitmap = BitmapFactory.decodeFile(originalFile.getPath());
-
-                                    float left, top, right, bottom;
-                                    if (type == 3) {
-                                        left = (float) cropView.getLeft() / (float) cameraPreview.getWidth();
-                                        top = (float) containerView.getTop() / (float) cameraPreview.getHeight();
-                                        right = (float) cropView.getRight() / (float) cameraPreview.getWidth();
-                                        bottom = (float) containerView.getBottom() / (float) cameraPreview.getHeight();
-                                    } else {
-                                        left = (float) containerView.getLeft() / (float) cameraPreview.getWidth();
-                                        top = (float) cropView.getTop() / (float) cameraPreview.getHeight();
-                                        right = (float) containerView.getRight() / (float) cameraPreview.getWidth();
-                                        bottom = (float) cropView.getBottom() / (float) cameraPreview.getHeight();
-                                    }
-                                    Bitmap cropBitmap = Bitmap.createBitmap(bitmap,
-                                            (int) (left * (float) bitmap.getWidth()),
-                                            (int) (top * (float) bitmap.getHeight()),
-                                            (int) ((right - left) * (float) bitmap.getWidth()),
-                                            (int) ((bottom - top) * (float) bitmap.getHeight()));
-
-                                    final File cropFile = getCropFile();
-                                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(cropFile));
-                                    cropBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-                                    bos.flush();
-                                    bos.close();
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            Intent intent = new Intent();
-                                            intent.putExtra("result", cropFile.getPath());
-                                            setResult(0x14, intent);
-                                            finish();
-                                        }
-                                    });
-                                    return;
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // TODO: 2017/8/17 failed
-                                    }
-                                });
+                                // TODO: 2017/8/17 failed
                             }
-                        }).start();
-
+                        });
                     }
-                });
-                break;
-            case R.id.camera_flash:
-                boolean isFlashOn = cameraPreview.switchFlashLight();
-                flashImageView.setImageResource(isFlashOn ? R.mipmap.camera_flash_on : R.mipmap.camera_flash_off);
-                break;
-        }
+                }).start();
+
+            }
+        });
     }
 
     private File getOriginalFile() {

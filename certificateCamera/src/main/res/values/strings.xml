@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="touch_to_focus">触摸屏幕对焦</string>
+    <color name="preview_mock">#9a000000</color>
+</resources>

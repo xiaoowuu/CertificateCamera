@@ -1,4 +1,4 @@
-package win.smartown.library.camera;
+package win.smartown.android.library.certificateCamera;
 
 import android.content.Context;
 import android.content.pm.PackageManager;

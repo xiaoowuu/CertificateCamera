@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="#000">
 
-    <win.smartown.library.camera.CameraPreview
+    <win.smartown.android.library.certificateCamera.CameraPreview
         android:id="@+id/camera_surface"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -24,9 +24,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:background="#9a000000"
+                android:background="@color/preview_mock"
                 android:gravity="center"
-                android:text="触摸进行对焦"
+                android:text="@string/touch_to_focus"
                 android:textColor="#afff"
                 android:textSize="16dp" />
 
@@ -40,7 +40,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="#9a000000" />
+                    android:background="@color/preview_mock" />
 
                 <ImageView
                     android:id="@+id/camera_crop"
@@ -52,7 +52,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="#9a000000" />
+                    android:background="@color/preview_mock" />
 
             </LinearLayout>
 
@@ -62,7 +62,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#9a000000"
+            android:background="@color/preview_mock"
             android:gravity="center"
             android:orientation="horizontal">
 

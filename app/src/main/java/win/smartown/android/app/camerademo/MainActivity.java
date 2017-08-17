@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 
+import win.smartown.android.library.certificateCamera.CameraActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
