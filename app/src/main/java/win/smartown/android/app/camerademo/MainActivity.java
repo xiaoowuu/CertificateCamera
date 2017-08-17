@@ -45,7 +45,12 @@ public class MainActivity extends AppCompatActivity {
         takePhoto(2);
     }
 
-    public void 营业执照(View view) {
+    public void 营业执照竖版(View view) {
         takePhoto(3);
     }
+
+    public void 营业执照横版(View view) {
+        takePhoto(4);
+    }
+
 }

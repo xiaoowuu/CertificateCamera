@@ -14,44 +14,70 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="8dp">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/shape_button"
-            android:gravity="center"
-            android:onClick="身份证正面"
-            android:text="身份证正面"
-            android:textColor="#555"
-            android:textSize="16dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/shape_button"
-            android:gravity="center"
-            android:onClick="身份证反面"
-            android:text="身份证反面"
-            android:textColor="#555"
-            android:textSize="16dp" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/shape_button"
+                android:gravity="center"
+                android:onClick="身份证正面"
+                android:text="身份证正面"
+                android:textColor="#555"
+                android:textSize="16dp" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/shape_button"
-            android:gravity="center"
-            android:onClick="营业执照"
-            android:text="营业执照"
-            android:textColor="#555"
-            android:textSize="16dp" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/shape_button"
+                android:gravity="center"
+                android:onClick="身份证反面"
+                android:text="身份证反面"
+                android:textColor="#555"
+                android:textSize="16dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/shape_button"
+                android:gravity="center"
+                android:onClick="营业执照竖版"
+                android:text="营业执照竖版"
+                android:textColor="#555"
+                android:textSize="16dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/shape_button"
+                android:gravity="center"
+                android:onClick="营业执照横版"
+                android:text="营业执照横版"
+                android:textColor="#555"
+                android:textSize="16dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

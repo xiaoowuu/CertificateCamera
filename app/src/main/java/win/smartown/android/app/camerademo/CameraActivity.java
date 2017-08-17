@@ -32,7 +32,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView flashImageView;
 
     /**
-     * 1.身份证正面；2.身份证反面；3.营业执照
+     * 1.身份证正面；2.身份证反面；3.营业执照（竖版）；4.营业执照（横版）
      */
     private int type;
 
@@ -63,9 +63,16 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         containerView = findViewById(R.id.camera_crop_container);
         cropView = (ImageView) findViewById(R.id.camera_crop);
         if (type == 3) {
-            float width = (int) (screenMinSize * 0.75);
+            float width = (int) (screenMinSize * 0.8);
             float height = (int) (width * 43.0f / 30.0f);
             LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) height);
+            LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
+            containerView.setLayoutParams(containerParams);
+            cropView.setLayoutParams(cropParams);
+        } else if (type == 4) {
+            float height = (int) (screenMinSize * 0.8);
+            float width = (int) (height * 43.0f / 30.0f);
+            LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams((int) width, ViewGroup.LayoutParams.MATCH_PARENT);
             LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
             containerView.setLayoutParams(containerParams);
             cropView.setLayoutParams(cropParams);
@@ -86,6 +93,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 break;
             case 3:
                 cropView.setImageResource(R.mipmap.camera_company);
+                break;
+            case 4:
+                cropView.setImageResource(R.mipmap.camera_company_landscape);
                 break;
         }
 
