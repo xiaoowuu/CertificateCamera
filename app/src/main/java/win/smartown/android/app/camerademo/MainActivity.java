@@ -27,9 +27,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        final String path = CameraActivity.getResult(requestCode, resultCode, data);
-        if (!TextUtils.isEmpty(path)) {
-            imageView.setImageBitmap(BitmapFactory.decodeFile(path));
+        if (requestCode == CameraActivity.REQUEST_CODE && resultCode == CameraActivity.RESULT_CODE) {
+            final String path = CameraActivity.getResult(data);
+            if (!TextUtils.isEmpty(path)) {
+                imageView.setImageBitmap(BitmapFactory.decodeFile(path));
+            }
         }
     }
 

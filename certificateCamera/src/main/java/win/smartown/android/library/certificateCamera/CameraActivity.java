@@ -41,8 +41,8 @@ public class CameraActivity extends Activity implements View.OnClickListener {
         activity.startActivityForResult(intent, REQUEST_CODE);
     }
 
-    public static String getResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_CODE) {
+    public static String getResult(Intent data) {
+        if (data != null) {
             return data.getStringExtra("result");
         }
         return "";
@@ -68,9 +68,9 @@ public class CameraActivity extends Activity implements View.OnClickListener {
         }
         setContentView(R.layout.activity_camera);
         cameraPreview = (CameraPreview) findViewById(R.id.camera_surface);
-//        //获取屏幕最小边，设置为cameraPreview的宽
+//        //获取屏幕最小边，设置为cameraPreview较窄的一边
         float screenMinSize = Math.min(getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
-//        //根据cameraPreview的宽，计算出cameraPreview的长，长宽比为标准的16:9
+//        //根据screenMinSize，计算出cameraPreview的较宽的一边，长宽比为标准的16:9
         float maxSize = screenMinSize / 9.0f * 16.0f;
         RelativeLayout.LayoutParams layoutParams;
         if (type == TYPE_COMPANY_PORTRAIT) {
@@ -245,6 +245,9 @@ public class CameraActivity extends Activity implements View.OnClickListener {
         return new File(getExternalCacheDir(), "pictureCrop.jpg");
     }
 
+    /**
+     * 点击对勾，使用拍照结果，返回对应图片路径
+     */
     private void goBack() {
         Intent intent = new Intent();
         intent.putExtra("result", getCropFile().getPath());

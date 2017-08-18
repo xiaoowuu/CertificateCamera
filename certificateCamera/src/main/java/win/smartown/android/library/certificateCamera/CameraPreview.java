@@ -19,7 +19,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private static String TAG = CameraPreview.class.getName();
 
-    private SurfaceHolder surfaceHolder;
     private Camera camera;
 
     public CameraPreview(Context context) {
@@ -44,8 +43,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void init() {
-        Log.d(TAG, "init");
-        surfaceHolder = getHolder();
+        SurfaceHolder surfaceHolder = getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setKeepScreenOn(true);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -56,6 +54,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             camera = CameraUtils.openCamera();
             Camera.Parameters parameters = camera.getParameters();
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                //竖屏拍照时，需要设置旋转90度，否者看到的相机预览方向和界面方向不相同
                 camera.setDisplayOrientation(90);
                 parameters.setRotation(90);
             } else {
@@ -71,21 +70,29 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 parameters.setPictureSize(1920, 1080);
             }
             camera.setParameters(parameters);
-            camera.setPreviewDisplay(surfaceHolder);
+            camera.setPreviewDisplay(holder);
             camera.startPreview();
-            camera.autoFocus(null);
+            focus();
         } catch (Exception e) {
             Log.d(TAG, "Error setting camera preview: " + e.getMessage());
         }
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+        //因为设置了固定屏幕方向，所以在实际使用中不会触发这个方法
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
+        //回收释放资源
         release();
     }
 
+    /**
+     * Android相机的预览尺寸都是4:3或者16:9，这里遍历所有支持的预览尺寸，得到16:9的最大尺寸，保证成像清晰度
+     *
+     * @param sizes
+     * @return 最佳尺寸
+     */
     private Camera.Size getBestSize(List<Camera.Size> sizes) {
         Camera.Size bestSize = null;
         for (Camera.Size size : sizes) {
@@ -102,6 +109,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return bestSize;
     }
 
+    /**
+     * 释放资源
+     */
     private void release() {
         if (camera != null) {
             camera.stopPreview();
@@ -110,10 +120,18 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
+    /**
+     * 对焦，在CameraActivity中触摸对焦
+     */
     public void focus() {
         camera.autoFocus(null);
     }
 
+    /**
+     * 开关闪光灯
+     *
+     * @return 闪光灯是否开启
+     */
     public boolean switchFlashLight() {
         if (camera != null) {
             Camera.Parameters parameters = camera.getParameters();
@@ -130,6 +148,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return false;
     }
 
+    /**
+     * 拍摄照片
+     *
+     * @param pictureCallback 在pictureCallback处理拍照回调
+     */
     public void takePhoto(Camera.PictureCallback pictureCallback) {
         camera.takePicture(null, null, pictureCallback);
     }
