@@ -50,31 +50,50 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
-        try {
-            camera = CameraUtils.openCamera();
-            Camera.Parameters parameters = camera.getParameters();
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                //竖屏拍照时，需要设置旋转90度，否者看到的相机预览方向和界面方向不相同
-                camera.setDisplayOrientation(90);
-                parameters.setRotation(90);
-            } else {
-                camera.setDisplayOrientation(0);
-                parameters.setRotation(0);
+        camera = CameraUtils.openCamera();
+        if (camera != null) {
+            try {
+                camera.setPreviewDisplay(holder);
+                Camera.Parameters parameters = camera.getParameters();
+                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    //竖屏拍照时，需要设置旋转90度，否者看到的相机预览方向和界面方向不相同
+                    camera.setDisplayOrientation(90);
+                    parameters.setRotation(90);
+                } else {
+                    camera.setDisplayOrientation(0);
+                    parameters.setRotation(0);
+                }
+                Camera.Size bestSize = getBestSize(parameters.getSupportedPreviewSizes());
+                if (bestSize != null) {
+                    parameters.setPreviewSize(bestSize.width, bestSize.height);
+                    parameters.setPictureSize(bestSize.width, bestSize.height);
+                } else {
+                    parameters.setPreviewSize(1920, 1080);
+                    parameters.setPictureSize(1920, 1080);
+                }
+                camera.setParameters(parameters);
+                camera.startPreview();
+                focus();
+            } catch (Exception e) {
+                Log.d(TAG, "Error setting camera preview: " + e.getMessage());
+                try {
+                    Camera.Parameters parameters = camera.getParameters();
+                    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                        //竖屏拍照时，需要设置旋转90度，否者看到的相机预览方向和界面方向不相同
+                        camera.setDisplayOrientation(90);
+                        parameters.setRotation(90);
+                    } else {
+                        camera.setDisplayOrientation(0);
+                        parameters.setRotation(0);
+                    }
+                    camera.setParameters(parameters);
+                    camera.startPreview();
+                    focus();
+                } catch (Exception e1) {
+                    e.printStackTrace();
+                    camera = null;
+                }
             }
-            Camera.Size bestSize = getBestSize(parameters.getSupportedPreviewSizes());
-            if (bestSize != null) {
-                parameters.setPreviewSize(bestSize.width, bestSize.height);
-                parameters.setPictureSize(bestSize.width, bestSize.height);
-            } else {
-                parameters.setPreviewSize(1920, 1080);
-                parameters.setPictureSize(1920, 1080);
-            }
-            camera.setParameters(parameters);
-            camera.setPreviewDisplay(holder);
-            camera.startPreview();
-            focus();
-        } catch (Exception e) {
-            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
         }
     }
 
@@ -124,7 +143,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
      * 对焦，在CameraActivity中触摸对焦
      */
     public void focus() {
-        camera.autoFocus(null);
+        if (camera != null) {
+            camera.autoFocus(null);
+        }
     }
 
     /**
@@ -154,11 +175,16 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
      * @param pictureCallback 在pictureCallback处理拍照回调
      */
     public void takePhoto(Camera.PictureCallback pictureCallback) {
-        camera.takePicture(null, null, pictureCallback);
+        if (camera != null) {
+            camera.takePicture(null, null, pictureCallback);
+            camera.stopPreview();
+        }
     }
 
     public void startPreview() {
-        camera.startPreview();
+        if (camera != null) {
+            camera.startPreview();
+        }
     }
 
 }
