@@ -20,20 +20,39 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * Created by Smartown on 2017/8/16.
+ * Created by smartown on 2018/2/24 11:46.
+ * <br>
+ * Desc:
+ * <br>
+ * 拍照界面
  */
 public class CameraActivity extends Activity implements View.OnClickListener {
 
+    /**
+     * 拍摄类型-身份证正面
+     */
     public final static int TYPE_IDCARD_FRONT = 1;
+    /**
+     * 拍摄类型-身份证反面
+     */
     public final static int TYPE_IDCARD_BACK = 2;
+    /**
+     * 拍摄类型-竖版营业执照
+     */
     public final static int TYPE_COMPANY_PORTRAIT = 3;
+    /**
+     * 拍摄类型-横版营业执照
+     */
     public final static int TYPE_COMPANY_LANDSCAPE = 4;
 
     public final static int REQUEST_CODE = 0X13;
     public final static int RESULT_CODE = 0X14;
 
     /**
-     * TYPE_IDCARD_FRONT 身份证正面；TYPE_IDCARD_BACK 身份证反面；TYPE_COMPANY_PORTRAIT 营业执照（竖版）；TYPE_COMPANY_LANDSCAPE 营业执照（横版）
+     * @param type {@link #TYPE_IDCARD_FRONT}
+     *             {@link #TYPE_IDCARD_BACK}
+     *             {@link #TYPE_COMPANY_PORTRAIT}
+     *             {@link #TYPE_COMPANY_LANDSCAPE}
      */
     public static void openCertificateCamera(Activity activity, int type) {
         Intent intent = new Intent(activity, CameraActivity.class);
@@ -41,6 +60,9 @@ public class CameraActivity extends Activity implements View.OnClickListener {
         activity.startActivityForResult(intent, REQUEST_CODE);
     }
 
+    /**
+     * @return 结果文件路径
+     */
     public static String getResult(Intent data) {
         if (data != null) {
             return data.getStringExtra("result");
@@ -61,16 +83,16 @@ public class CameraActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         type = getIntent().getIntExtra("type", 0);
-        if (type == 3) {
+        if (type == TYPE_COMPANY_PORTRAIT) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
         setContentView(R.layout.activity_camera);
         cameraPreview = (CameraPreview) findViewById(R.id.camera_surface);
-//        //获取屏幕最小边，设置为cameraPreview较窄的一边
+        //获取屏幕最小边，设置为cameraPreview较窄的一边
         float screenMinSize = Math.min(getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
-//        //根据screenMinSize，计算出cameraPreview的较宽的一边，长宽比为标准的16:9
+        //根据screenMinSize，计算出cameraPreview的较宽的一边，长宽比为标准的16:9
         float maxSize = screenMinSize / 9.0f * 16.0f;
         RelativeLayout.LayoutParams layoutParams;
         if (type == TYPE_COMPANY_PORTRAIT) {
@@ -159,6 +181,7 @@ public class CameraActivity extends Activity implements View.OnClickListener {
         cameraPreview.takePhoto(new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data, Camera camera) {
+                //子线程处理图片，防止ANR
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -170,6 +193,7 @@ public class CameraActivity extends Activity implements View.OnClickListener {
 
                             Bitmap bitmap = BitmapFactory.decodeFile(originalFile.getPath());
 
+                            //计算裁剪位置
                             float left, top, right, bottom;
                             if (type == TYPE_COMPANY_PORTRAIT) {
                                 left = (float) cropView.getLeft() / (float) cameraPreview.getWidth();
@@ -182,6 +206,7 @@ public class CameraActivity extends Activity implements View.OnClickListener {
                                 right = (float) containerView.getRight() / (float) cameraPreview.getWidth();
                                 bottom = (float) cropView.getBottom() / (float) cameraPreview.getHeight();
                             }
+                            //裁剪及保存到文件
                             Bitmap cropBitmap = Bitmap.createBitmap(bitmap,
                                     (int) (left * (float) bitmap.getWidth()),
                                     (int) (top * (float) bitmap.getHeight()),
@@ -219,6 +244,9 @@ public class CameraActivity extends Activity implements View.OnClickListener {
         });
     }
 
+    /**
+     * @return 拍摄图片原始文件
+     */
     private File getOriginalFile() {
         switch (type) {
             case TYPE_IDCARD_FRONT:
@@ -232,6 +260,9 @@ public class CameraActivity extends Activity implements View.OnClickListener {
         return new File(getExternalCacheDir(), "picture.jpg");
     }
 
+    /**
+     * @return 拍摄图片裁剪文件
+     */
     private File getCropFile() {
         switch (type) {
             case TYPE_IDCARD_FRONT:

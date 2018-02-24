@@ -13,7 +13,11 @@ import android.view.SurfaceView;
 import java.util.List;
 
 /**
- * Created by Smartown on 2017/8/16.
+ * Created by smartown on 2018/2/24 11:46.
+ * <br>
+ * Desc:
+ * <br>
+ * 相机预览封装
  */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 

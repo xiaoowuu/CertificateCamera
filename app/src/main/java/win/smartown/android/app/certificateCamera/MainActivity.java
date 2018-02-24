@@ -1,4 +1,4 @@
-package win.smartown.android.app.camerademo;
+package win.smartown.android.app.certificateCamera;
 
 import android.Manifest;
 import android.content.Intent;
@@ -14,6 +14,13 @@ import android.widget.ImageView;
 
 import win.smartown.android.library.certificateCamera.CameraActivity;
 
+/**
+ * Created by smartown on 2018/2/24 11:46.
+ * <br>
+ * Desc:
+ * <br>
+ * demo演示
+ */
 public class MainActivity extends AppCompatActivity {
 
     private ImageView imageView;
@@ -28,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CameraActivity.REQUEST_CODE && resultCode == CameraActivity.RESULT_CODE) {
+            //获取文件路径，显示图片
             final String path = CameraActivity.getResult(data);
             if (!TextUtils.isEmpty(path)) {
                 imageView.setImageBitmap(BitmapFactory.decodeFile(path));
@@ -35,6 +43,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 拍摄证件照片
+     *
+     * @param type 拍摄证件类型
+     */
     private void takePhoto(int type) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0x12);
@@ -43,19 +56,31 @@ public class MainActivity extends AppCompatActivity {
         CameraActivity.openCertificateCamera(this, type);
     }
 
-    public void 身份证正面(View view) {
+    /**
+     * 身份证正面
+     */
+    public void frontIdCard(View view) {
         takePhoto(CameraActivity.TYPE_IDCARD_FRONT);
     }
 
-    public void 身份证反面(View view) {
+    /**
+     * 身份证反面
+     */
+    public void backIdCard(View view) {
         takePhoto(CameraActivity.TYPE_IDCARD_BACK);
     }
 
-    public void 营业执照竖版(View view) {
+    /**
+     * 营业执照竖版
+     */
+    public void businessLicensePortrait(View view) {
         takePhoto(CameraActivity.TYPE_COMPANY_PORTRAIT);
     }
 
-    public void 营业执照横版(View view) {
+    /**
+     * 营业执照横版
+     */
+    public void businessLicenseLandscape(View view) {
         takePhoto(CameraActivity.TYPE_COMPANY_LANDSCAPE);
     }
 

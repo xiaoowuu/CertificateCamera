@@ -29,7 +29,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_button"
                 android:gravity="center"
-                android:onClick="身份证正面"
+                android:onClick="frontIdCard"
                 android:text="身份证正面"
                 android:textColor="#555"
                 android:textSize="16dp" />
@@ -41,7 +41,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_button"
                 android:gravity="center"
-                android:onClick="身份证反面"
+                android:onClick="backIdCard"
                 android:text="身份证反面"
                 android:textColor="#555"
                 android:textSize="16dp" />
@@ -60,7 +60,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_button"
                 android:gravity="center"
-                android:onClick="营业执照竖版"
+                android:onClick="businessLicensePortrait"
                 android:text="营业执照竖版"
                 android:textColor="#555"
                 android:textSize="16dp" />
@@ -72,7 +72,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/shape_button"
                 android:gravity="center"
-                android:onClick="营业执照横版"
+                android:onClick="businessLicenseLandscape"
                 android:text="营业执照横版"
                 android:textColor="#555"
                 android:textSize="16dp" />

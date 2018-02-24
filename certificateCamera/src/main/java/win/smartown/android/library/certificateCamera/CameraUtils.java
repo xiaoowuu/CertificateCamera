@@ -5,7 +5,11 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 
 /**
- * Created by Smartown on 2017/8/16.
+ * Created by smartown on 2018/2/24 11:46.
+ * <br>
+ * Desc:
+ * <br>
+ * 工具类
  */
 public class CameraUtils {
     /**
